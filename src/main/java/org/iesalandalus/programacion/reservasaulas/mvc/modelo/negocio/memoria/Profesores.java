@@ -1,4 +1,4 @@
-package org.iesalandalus.programacion.reservasaulas.mvc.modelo.negocio;
+package org.iesalandalus.programacion.reservasaulas.mvc.modelo.negocio.memoria;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -6,8 +6,10 @@ import java.util.List;
 
 import javax.naming.OperationNotSupportedException;
 import org.iesalandalus.programacion.reservasaulas.mvc.modelo.dominio.Profesor;
+import org.iesalandalus.programacion.reservasaulas.mvc.modelo.negocio.IProfesores;
 
-public class Profesores {
+
+public class Profesores implements IProfesores {
 	// Atributos
 	private List<Profesor> coleccionProfesores;
 
@@ -17,7 +19,7 @@ public class Profesores {
 	}
 
 	// Constructor copia
-	public Profesores(Profesores profesores) {
+	public Profesores(IProfesores profesores) {
 		if (profesores == null) {
 			throw new NullPointerException(" No se pueden copiar profesores nulos.");
 		} else {
@@ -26,7 +28,7 @@ public class Profesores {
 	}
 	
 	// Método setProfesores(Profesores)
-	private void setProfesores(Profesores profesores) {
+	private void setProfesores(IProfesores profesores) {
 		if (profesores == null) {
 			throw new NullPointerException(" No se puede copiar un profesor nulo.");
 		} else {
@@ -59,7 +61,7 @@ public class Profesores {
 	public void insertar(Profesor profesor) throws OperationNotSupportedException {
 		if (profesor == null) {
 			throw new NullPointerException("No se puede insertar un profesor nulo.");
-		} else if (buscar(profesor) == null) {
+		} else if  (!coleccionProfesores.contains(profesor)) {
 			coleccionProfesores.add(new Profesor(profesor));
 		} else {
 			throw new OperationNotSupportedException("Ya existe un profesor con ese nombre.");
@@ -71,7 +73,6 @@ public class Profesores {
 		if (profesor == null) {
 			throw new NullPointerException(" No se puede buscar un profesor nulo.");
 		}
-		// Se mira si hay un Profesor que existe en coleccionProfesores
 		Profesor profesorEncontrado = null;
 		int indice = coleccionProfesores.indexOf(profesor);
 		if (indice == -1) {
@@ -86,10 +87,10 @@ public class Profesores {
 	public void borrar(Profesor profesor) throws OperationNotSupportedException {
 		if (profesor == null) {
 			throw new NullPointerException("No se puede borrar un profesor nulo.");
-		} else if (buscar(profesor) == null) {
+		} else if  (!coleccionProfesores.contains(profesor)) {
 			throw new OperationNotSupportedException("No existe ningún profesor con ese nombre.");
 		} else {
-			coleccionProfesores.remove(coleccionProfesores.indexOf(profesor));
+			coleccionProfesores.remove(profesor);
 		}
 	}
 

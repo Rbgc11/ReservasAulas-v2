@@ -1,4 +1,4 @@
-package org.iesalandalus.programacion.reservasaulas.mvc.modelo.negocio;
+package org.iesalandalus.programacion.reservasaulas.mvc.modelo.negocio.memoria;
 
 import java.time.LocalDate;
 import java.time.Month;
@@ -6,14 +6,19 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+
 import javax.naming.OperationNotSupportedException;
 import org.iesalandalus.programacion.reservasaulas.mvc.modelo.dominio.Aula;
 import org.iesalandalus.programacion.reservasaulas.mvc.modelo.dominio.Permanencia;
 import org.iesalandalus.programacion.reservasaulas.mvc.modelo.dominio.Profesor;
 import org.iesalandalus.programacion.reservasaulas.mvc.modelo.dominio.Reserva;
+import org.iesalandalus.programacion.reservasaulas.mvc.modelo.dominio.PermanenciaPorHora;
+import org.iesalandalus.programacion.reservasaulas.mvc.modelo.dominio.PermanenciaPorTramo;
+import org.iesalandalus.programacion.reservasaulas.mvc.modelo.negocio.IReservas;
 
-public class Reservas {
+public class Reservas implements IReservas{
 	// Atributos
+	private static final float MAX_PUNTOS_PROFESOR_MES = 150.0f;
 	private List<Reserva> coleccionReservas = new ArrayList<>();
 
 	// Constructor por defecto
@@ -22,7 +27,7 @@ public class Reservas {
 	}
 
 	// Constructor copia
-	public Reservas(Reservas reservas) {
+	public Reservas(IReservas reservas) {
 		if (reservas == null) {
 			throw new NullPointerException(" No se pueden copiar reservas nulas.");
 		} else {
@@ -31,7 +36,7 @@ public class Reservas {
 	}
 
 	// Método setReservas
-	private void setReservas(Reservas reservas) {
+	private void setReservas(IReservas reservas) {
 		if (reservas == null) {
 			throw new NullPointerException("No se puede copiar una reserva nula.");
 		} else {
@@ -63,18 +68,44 @@ public class Reservas {
 	// Método insertar
 	public void insertar(Reserva reserva) throws OperationNotSupportedException {
 		if (reserva == null) {
-			throw new NullPointerException("No se puede realizar una reserva nula.");
-		} else if (buscar(reserva) == null) {
-			coleccionReservas.add(new Reserva(reserva));
-		} else {
-			throw new OperationNotSupportedException("La reserva ya existe.");
-		}
-	}
+				throw new NullPointerException(" No se puede insertar una reserva nula.");
+			}
 
-	// Método esMesSiguienteOPosterior(Reserva)
+			Reserva reservaNueva = getReservaAulaDia(reserva.getAula(), reserva.getPermanencia().getDia());
+			if (reservaNueva != null) {
+
+				if (reservaNueva.getPermanencia() instanceof PermanenciaPorTramo
+						&& reserva.getPermanencia() instanceof PermanenciaPorHora) {
+					throw new OperationNotSupportedException(
+							" Ya se ha realizado una reserva de otro tipo de permanencia para este día.");
+				}
+				if (reservaNueva.getPermanencia() instanceof PermanenciaPorHora
+						&& reserva.getPermanencia() instanceof PermanenciaPorTramo) {
+					throw new OperationNotSupportedException(
+							" Ya se ha realizado una reserva de otro tipo de permanencia para este día.");
+				}
+			}
+			if (!esMesSiguienteOPosterior(reserva)) {
+				throw new OperationNotSupportedException(
+						" Sólo se pueden hacer reservas para el mes que viene o posteriores.");
+			}
+			if (getPuntosGastadosReserva(reserva) > MAX_PUNTOS_PROFESOR_MES) {
+				throw new OperationNotSupportedException(
+						" Esta reserva supera los puntos máximos por mes para dicho profesor.");
+			}
+			if (coleccionReservas.contains(reserva)) {
+				throw new OperationNotSupportedException("Ya existe una reserva igual.");
+			}
+			else {
+				coleccionReservas.add(new Reserva(reserva));
+			}
+
+		}
+
+	// Método esMesSiguienteOPosterior
 	private boolean esMesSiguienteOPosterior(Reserva reserva) {
 		if (reserva == null) {
-			throw new NullPointerException("ERROR: La reserva no puede ser nula");
+			throw new NullPointerException(" La reserva no puede ser nula");
 		}
 		boolean mesSiguiente = false;
 		Month mes = reserva.getPermanencia().getDia().getMonth();
@@ -85,13 +116,19 @@ public class Reservas {
 		return mesSiguiente;
 
 	}
+	
+	
+	//Método getPuntosGastadosReserva
+	private float getPuntosGastadosReserva(Reserva reserva) {
+		return reserva.getPuntos();
+	}
 
-	// Método List<Reserva> getReservasProfesorMes(Profesor, LocalDate)
+	// Método List<Reserva> getReservasProfesorMes
 	private List<Reserva> getReservasProfesorMes(Profesor profesor, LocalDate fecha) {
 		if (profesor == null) {
-			throw new NullPointerException("ERROR: El profesor no puede ser nulo");
+			throw new NullPointerException("El profesor no puede ser nulo");
 		} else if (fecha == null) {
-			throw new NullPointerException("ERROR: La fecha no puede ser nula");
+			throw new NullPointerException(" La fecha no puede ser nula");
 		}
 		List<Reserva> reservasMes = new ArrayList<>();
 		Iterator<Reserva> iterador = coleccionReservas.iterator();
@@ -106,12 +143,13 @@ public class Reservas {
 		return reservasMes;
 	}
 
+	
 	// Método Reserva getReservaAulaDia(Aula, LocalDate)
-	private Reserva getReservaAulaDia(Aula aula, LocalDate fecha) {
+	public Reserva getReservaAulaDia(Aula aula, LocalDate fecha) {
 		if (aula == null) {
-			throw new NullPointerException("ERROR: El aula no puede ser nula");
+			throw new NullPointerException("El aula no puede ser nula");
 		} else if (fecha == null) {
-			throw new NullPointerException("ERROR: La fecha no puede ser nula");
+			throw new NullPointerException(" La fecha no puede ser nula");
 		}
 		Reserva reservaADia = null;
 		Iterator<Reserva> iterador = coleccionReservas.iterator();
@@ -129,7 +167,6 @@ public class Reservas {
 		if (reserva == null) {
 			throw new NullPointerException("No se puede buscar un reserva nula.");
 		}
-		// Se mira si hay una Reserva que exista en coleccionReservas
 		Reserva reservaEncontrada = null;
 		int indice = coleccionReservas.indexOf(reserva);
 		if (indice == -1) {
@@ -144,10 +181,12 @@ public class Reservas {
 	public void borrar(Reserva reserva) throws OperationNotSupportedException {
 		if (reserva == null) {
 			throw new NullPointerException("No se puede anular una reserva nula.");
-		} else if (buscar(reserva) == null) {
+		} else if (!esMesSiguienteOPosterior(reserva)) {
 			throw new OperationNotSupportedException("La reserva a anular no existe.");
+		} else if (coleccionReservas.contains(reserva)) {
+			coleccionReservas.remove(reserva);
 		} else {
-			coleccionReservas.remove(coleccionReservas.indexOf(reserva));
+			throw new OperationNotSupportedException(" No existe ninguna reserva como esa.");
 		}
 	}
 
@@ -220,8 +259,20 @@ public class Reservas {
 		Iterator<Reserva> iterador = coleccionReservas.iterator();
 		while (iterador.hasNext()) {
 			Reserva reserva = iterador.next();
-			if (permanencia.equals(reserva.getPermanencia()) && aula.equals(reserva.getAula())) {
+			if (!esMesSiguienteOPosterior(Reserva.getReservaFicticia(aula, permanencia))) {
 				disponibilidad = false;
+			} else if (aula.equals(reserva.getAula()) && permanencia.getDia().equals(reserva.getPermanencia().getDia())) {
+				if ((permanencia instanceof PermanenciaPorHora && reserva.getPermanencia() instanceof PermanenciaPorTramo)|| (permanencia instanceof PermanenciaPorTramo && reserva.getPermanencia() instanceof PermanenciaPorHora)) {
+					disponibilidad = false;
+				} else if (permanencia instanceof PermanenciaPorHora && reserva.getPermanencia() instanceof PermanenciaPorHora) {
+					if (((PermanenciaPorHora) permanencia).getHora().equals(((PermanenciaPorHora) reserva.getPermanencia()).getHora())) {
+						disponibilidad = false;
+					}
+				} else if (permanencia instanceof PermanenciaPorTramo&& reserva.getPermanencia() instanceof PermanenciaPorTramo) {
+					if (((PermanenciaPorTramo) permanencia).getTramo().equals(((PermanenciaPorTramo) reserva.getPermanencia()).getTramo())) {
+						disponibilidad = false;
+					}
+				}
 			}
 		}
 		return disponibilidad;

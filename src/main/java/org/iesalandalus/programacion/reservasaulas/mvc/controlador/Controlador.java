@@ -4,19 +4,19 @@ import java.util.List;
 
 import javax.naming.OperationNotSupportedException;
 
-import org.iesalandalus.programacion.reservasaulas.mvc.modelo.Modelo;
+import org.iesalandalus.programacion.reservasaulas.mvc.modelo.IModelo;
 import org.iesalandalus.programacion.reservasaulas.mvc.modelo.dominio.Aula;
 import org.iesalandalus.programacion.reservasaulas.mvc.modelo.dominio.Permanencia;
 import org.iesalandalus.programacion.reservasaulas.mvc.modelo.dominio.Profesor;
 import org.iesalandalus.programacion.reservasaulas.mvc.modelo.dominio.Reserva;
-import org.iesalandalus.programacion.reservasaulas.mvc.vista.Vista;
+import org.iesalandalus.programacion.reservasaulas.mvc.vista.IVista;
 
-public class Controlador {
+public class Controlador implements IControlador{
 
-	 private Modelo modelo;
-	 private Vista vista;
+	 private IModelo Imodelo;
+	 private IVista Ivista;
 
-	public Controlador(Modelo modelo, Vista vista) 
+	public Controlador(IModelo modelo, IVista vista) 
 	{
 		if (modelo == null) {
 			throw new IllegalArgumentException(" El modelo no puede ser nulo.");
@@ -26,94 +26,96 @@ public class Controlador {
 			throw new IllegalArgumentException(" La vista no puede ser nula.");
 		}
 		
-		this.modelo = modelo;
-		this.vista = vista;
-		this.vista.setControlador(this);
+		this.Imodelo = modelo;
+		this.Ivista = vista;
+		this.Ivista.setControlador(this);
 	}
 
 	// Método comenzar
+		@Override
 		public void comenzar()  {
-			vista.comenzar();
+			Ivista.comenzar();
 		}
 
 		// Método terminar
+		@Override
 		public void terminar() {
-			vista.salir();
+			Ivista.salir();
 		}
 
 		// Método insertarAula
 		public void insertarAula(Aula aula) throws OperationNotSupportedException {
-			modelo.insertarAula(aula);
+			Imodelo.insertarAula(aula);
 		}
 		
 		// Método insertarProfesor
 		public void insertarProfesor(Profesor profesor) throws OperationNotSupportedException {
-			modelo.insertarProfesor(profesor);
+			Imodelo.insertarProfesor(profesor);
 		}
 		
 		// Método borrarAula
 		public void borrarAula(Aula aula) throws OperationNotSupportedException {
-			modelo.borrarAula(aula);
+			Imodelo.borrarAula(aula);
 		}
 		
 		// Método borrarProfesor
 		public void borrarProfesor(Profesor profesor) throws OperationNotSupportedException {
-			modelo.borrarProfesor(profesor);
+			Imodelo.borrarProfesor(profesor);
 		}
 		
 		// Método buscarAula
 		public Aula buscarAula(Aula aula) {
-			return modelo.buscarAula(aula);
+			return Imodelo.buscarAula(aula);
 		}
 		
 		// Método buscarProfesor
 		public Profesor buscarProfesor(Profesor profesor) {
-			return modelo.buscarProfesor(profesor);
+			return Imodelo.buscarProfesor(profesor);
 		}
 
 		// Método representarAulas
 		public List<String> representarAulas() {
-			return modelo.representarAulas();
+			return Imodelo.representarAulas();
 		}
 
 		// Método representarProfesores
 		public List<String> representarProfesores() {
-			return modelo.representarProfesores();
+			return Imodelo.representarProfesores();
 		}
 
 		// Método representarReservas
 		public List<String>representarReservas() {
-			return modelo.representarReservas();
+			return Imodelo.representarReservas();
 		}
 		
 		// Método realizarReservas
 		public void realizarReserva(Reserva reserva) throws OperationNotSupportedException {
-			modelo.realizarReserva(reserva);
+			Imodelo.realizarReserva(reserva);
 		}
 
 		// Método anularReservas
 		public void anularReserva(Reserva reserva) throws OperationNotSupportedException {
-			modelo.anularReserva(reserva);
+			Imodelo.anularReserva(reserva);
 
 		}
 
 		// Método getReservasProfesor(Profesor)
 		public List<Reserva> getReservasProfesor(Profesor profesor) {
-			return modelo.getReservasProfesor(profesor);
+			return Imodelo.getReservasProfesor(profesor);
 		}
 
 		// Método getReservasAula(Aula)
 		public List<Reserva> getReservasAula(Aula aula) {
-			return modelo.getReservasAula(aula);
+			return Imodelo.getReservasAula(aula);
 		}
 
 		// Método getReservasPermanencia(Permanencia)
 		public List<Reserva> getReservasPermanencia(Permanencia permanencia) {
-			return modelo.getReservasPermanencia(permanencia);
+			return Imodelo.getReservasPermanencia(permanencia);
 		}
 
 		// Método consultarDisponibilidad(Aula,Permanencia)
 		public boolean consultarDisponibilidad(Aula aula, Permanencia permanencia) {
-			return modelo.consultarDisponibilidad(aula, permanencia);
+			return Imodelo.consultarDisponibilidad(aula, permanencia);
 		}
 	}

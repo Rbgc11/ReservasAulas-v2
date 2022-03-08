@@ -1,14 +1,16 @@
-package org.iesalandalus.programacion.reservasaulas.mvc.modelo.negocio;
+package org.iesalandalus.programacion.reservasaulas.mvc.modelo.negocio.memoria;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+
 import javax.naming.OperationNotSupportedException;
 import org.iesalandalus.programacion.reservasaulas.mvc.modelo.dominio.Aula;
+import org.iesalandalus.programacion.reservasaulas.mvc.modelo.negocio.IAulas;
 
 
-public class Aulas{
+public class Aulas implements IAulas{
 	
 	private List<Aula> coleccionAulas = new ArrayList<>();
 
@@ -18,7 +20,7 @@ public class Aulas{
 		}
 
 		// Constructor copia
-		public Aulas(Aulas aulas) {
+		public Aulas(IAulas aulas) {
 			if (aulas == null) {
 				throw new NullPointerException("No se pueden copiar unas aulas nulas.");
 			} else {
@@ -27,7 +29,7 @@ public class Aulas{
 		}
 		
 		// Método setAulas
-		private void setAulas(Aulas aulas) {
+		private void setAulas(IAulas aulas) {
 			if (aulas == null) {
 				throw new NullPointerException("No se puede copiar un aula nula.");
 			} else {
@@ -61,7 +63,7 @@ public class Aulas{
 		public void insertar(Aula aula) throws OperationNotSupportedException {
 			if (aula == null) {
 				throw new NullPointerException(" No se puede insertar un aula nula.");
-			} else if (buscar(aula) == null) {
+			} else if (!coleccionAulas.contains(aula)) {
 				coleccionAulas.add(new Aula(aula));
 			} else {
 				throw new OperationNotSupportedException(" Ya existe un aula con ese nombre.");
@@ -89,7 +91,7 @@ public class Aulas{
 		public void borrar(Aula aula) throws OperationNotSupportedException {
 			if (aula == null) {
 				throw new NullPointerException("No se puede borrar un aula nula.");
-			} else if (buscar(aula) == null) {
+			} else if (!coleccionAulas.contains(aula))  {
 				throw new OperationNotSupportedException("No existe ningún aula con ese nombre.");
 			} else {
 				coleccionAulas.remove(coleccionAulas.indexOf(aula));

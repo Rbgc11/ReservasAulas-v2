@@ -1,3 +1,4 @@
+
 package org.iesalandalus.programacion.reservasaulas.mvc.modelo.dominio;
 
 import java.util.Objects;
@@ -42,7 +43,7 @@ public class Reserva {
 		if (aula == null) {
 			throw new NullPointerException("No pueden haber valores nulos");
 		} else {
-			this.aula = new Aula(aula.getNombre());;
+			this.aula = new Aula(aula);
 		}
 	}
 
@@ -50,18 +51,43 @@ public class Reserva {
 		return new Aula(aula);
 	}
 
+	//Set de Permanencia
 	private void setPermanencia(Permanencia permanencia) {
 		if (permanencia == null) {
 			throw new NullPointerException("No pueden haber valores nulos");
-		} else {
-			this.permanencia = new Permanencia(permanencia.getDia(), permanencia.getTramo());
+			}
+			else if (permanencia instanceof PermanenciaPorTramo) {
+				this.permanencia = new PermanenciaPorTramo((PermanenciaPorTramo) permanencia);
+			}
+			else if (permanencia instanceof PermanenciaPorHora) {
+				this.permanencia = new PermanenciaPorHora((PermanenciaPorHora) permanencia);
+			}
 		}
+	
+	//Get de Permanencia
+		public Permanencia getPermanencia() {
+			Permanencia permanenciaC = null;
+			if (permanencia instanceof PermanenciaPorTramo) {
+				permanenciaC = new PermanenciaPorTramo((PermanenciaPorTramo) permanencia); 
+			}
+			else if (permanencia instanceof PermanenciaPorHora) {
+				permanenciaC = new PermanenciaPorHora((PermanenciaPorHora) permanencia);
+			}
+			return permanenciaC;
+		}
+
+		//Método getReservaFicticia
+	public static Reserva getReservaFicticia(Aula aula, Permanencia permanencia) {
+		
+		Reserva reserva=new Reserva(Profesor.getProfesorFicticio("ruben@gmail.com"),aula,permanencia);
+		return new Reserva(reserva);
+	}
+	//Método getPuntos, recoge los puntos de permanencia y aula
+	public float getPuntos() {
+		return permanencia.getPuntos() + aula.getPuntos();
 	}
 
-	public Permanencia getPermanencia() {
-		return new Permanencia(permanencia);
-	}
-
+	
 
 
 	@Override
@@ -69,33 +95,20 @@ public class Reserva {
 		return Objects.hash(aula, permanencia, profesor);
 	}
 
-
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
 			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
+		if (!(obj instanceof Reserva))
 			return false;
 		Reserva other = (Reserva) obj;
-		if (aula == null) {
-			if (other.aula != null)
-				return false;
-		} else if (!aula.equals(other.aula))
-			return false;
-		if (permanencia == null) {
-			if (other.permanencia != null)
-				return false;
-		} else if (!permanencia.equals(other.permanencia))
-			return false;
-		return true;
+		return Objects.equals(aula, other.aula) && Objects.equals(permanencia, other.permanencia)
+				&& Objects.equals(profesor, other.profesor);
 	}
-
 
 	@Override
 	public String toString() {
-		return "Profesor=" + profesor + ", aula=" + aula + ", permanencia=" + permanencia + "";
+		return String.format("%s, %s, %s, puntos=%.1f", profesor, aula, permanencia, getPuntos());
 	}
 
 	

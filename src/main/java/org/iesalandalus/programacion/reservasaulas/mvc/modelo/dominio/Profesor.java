@@ -24,11 +24,12 @@ public class Profesor { //Atributos
     public Profesor (Profesor profesor) {
         if (profesor == null) {
 			throw new NullPointerException("No se puede copiar un profesor nulo.");
-		}
+		} else {
 		setNombre(profesor.getNombre());
 		setTelefono(profesor.getTelefono());
 		setCorreo(profesor.getCorreo());
-	}
+		}
+    }
     
     //Set y Get de los atributos. El set usa el formateaNombre
     private void setNombre(String nombre) {        
@@ -57,7 +58,7 @@ public class Profesor { //Atributos
 
 
     
-    
+    //Set de Correo
     public void setCorreo(String correo) {       
         if(correo==null){
             throw new NullPointerException("El correo del profesor no puede ser nulo.");      
@@ -68,7 +69,7 @@ public class Profesor { //Atributos
             this.correo=correo;        
     }
     
-          
+    //Set de Telefono
 	public void setTelefono(String telefono){
 		if (telefono == null) {
 			this.telefono = null;
@@ -95,7 +96,12 @@ public class Profesor { //Atributos
     public String getTelefono() {
         return telefono;
     }
-
+    
+    //Método getProfesorFicticio
+  	public static Profesor getProfesorFicticio (String correo) {
+  		Profesor profesor=new Profesor("Profesor",correo,"678909876");
+  		return new Profesor(profesor);
+  	}
 	@Override
 	public int hashCode() {
 		return Objects.hash(correo, nombre, telefono);
@@ -104,18 +110,12 @@ public class Profesor { //Atributos
 	public boolean equals(Object obj) {
 		if (this == obj)
 			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
+		if (!(obj instanceof Profesor))
 			return false;
 		Profesor other = (Profesor) obj;
-		if (nombre == null) {
-			if (other.nombre != null)
-				return false;
-		} else if (!nombre.equals(other.nombre))
-			return false;
-		return true;
+		return Objects.equals(correo, other.correo);
 	}
+
 	@Override
 	public String toString() {
 		if(telefono == null) {
