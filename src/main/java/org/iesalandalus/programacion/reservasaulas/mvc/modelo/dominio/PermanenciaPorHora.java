@@ -36,11 +36,11 @@ public class PermanenciaPorHora extends Permanencia {
 
 	private void setHora(LocalTime hora) {
 		if (hora == null) {
-			throw new NullPointerException(" La hora de una permanencia no puede ser nula.");
+			throw new NullPointerException("ERROR: La hora de una permanencia no puede ser nula.");
 		} else if (hora.isBefore(HORA_INICIO) || hora.isAfter(HORA_FIN)) {
-			throw new IllegalArgumentException("La hora de una permanencia no es válida.");
+			throw new IllegalArgumentException( "ERROR: La hora de una permanencia no es válida.");
 		} else if (hora.getMinute() != 0) {
-			throw new IllegalArgumentException(" La hora de una permanencia debe ser una hora en punto.");
+			throw new IllegalArgumentException("ERROR: La hora de una permanencia debe ser una hora en punto.");
 		}
 		this.hora = hora;
 	}
@@ -72,6 +72,6 @@ public class PermanenciaPorHora extends Permanencia {
 	// Método toString
 	@Override
 	public String toString() {
-		return "hora=" + hora.format(FORMATO_HORA);
+		return "día=" + getDia().format(FORMATO_DIA) + ", hora=" + hora.format(FORMATO_HORA);
 	}
 }

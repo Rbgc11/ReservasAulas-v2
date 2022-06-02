@@ -5,7 +5,8 @@ import java.time.Month;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-
+import java.util.Collections;
+import java.util.Comparator;
 
 import javax.naming.OperationNotSupportedException;
 import org.iesalandalus.programacion.reservasaulas.mvc.modelo.dominio.Aula;
@@ -46,19 +47,37 @@ public class Reservas implements IReservas{
 
 	// Método copiaProfundaReservas
 	private List<Reserva> copiaProfundaReservas(List<Reserva> listaReservas) {
-		List<Reserva> copiaProReservas = new ArrayList<>();
+		List<Reserva> copiaPro = new ArrayList<>();
 		Iterator<Reserva> iterador = listaReservas.iterator();
 		while (iterador.hasNext()) {
-			copiaProReservas.add(new Reserva(iterador.next()));
+			copiaPro.add(new Reserva(iterador.next()));
 		}
-		return copiaProReservas;
+		return copiaPro;
 	}
 
 	// Método List<Reservas> getReservas()
+	@Override
 	public List<Reserva> getReservas() {
-		return copiaProfundaReservas(coleccionReservas);
-	}
+		List<Reserva> reservasOrdenadas = copiaProfundaReservas(coleccionReservas);
+		Comparator<Aula> comparadorAula = Comparator.comparing(Aula::getNombre);
+		Comparator<Permanencia> comparadorPermanencia = (Permanencia p1, Permanencia p2) -> {
+			int comparacionPermanencia = -1;
+			if (p1.getDia().equals(p2.getDia())) {
+				if (p1 instanceof PermanenciaPorTramo && p2 instanceof PermanenciaPorTramo) {
+					comparacionPermanencia = Integer.compare(((PermanenciaPorTramo) p1).getTramo().ordinal(),
+							((PermanenciaPorTramo) p2).getTramo().ordinal());
+				} else if (p1 instanceof PermanenciaPorHora && p2 instanceof PermanenciaPorHora) {
+					comparacionPermanencia = ((PermanenciaPorHora) p1).getHora().compareTo(((PermanenciaPorHora) p2).getHora());
+				}
+			} else {
+				comparacionPermanencia = p1.getDia().compareTo(p2.getDia());
+			}
+			return comparacionPermanencia;
+		};
 
+		reservasOrdenadas.sort(Comparator.comparing(Reserva::getAula, comparadorAula).thenComparing(Reserva::getPermanencia, comparadorPermanencia));
+		return reservasOrdenadas;
+	}
 	// Método getNumReservas
 	public int getNumReservas() {
 		return coleccionReservas.size();
@@ -70,21 +89,11 @@ public class Reservas implements IReservas{
 		if (reserva == null) {
 				throw new NullPointerException(" No se puede insertar una reserva nula.");
 			}
+		
+		if (coleccionReservas.contains(reserva)) {
+			throw new OperationNotSupportedException("Ya existe una reserva igual.");
+		} 
 
-			Reserva reservaNueva = getReservaAulaDia(reserva.getAula(), reserva.getPermanencia().getDia());
-			if (reservaNueva != null) {
-
-				if (reservaNueva.getPermanencia() instanceof PermanenciaPorTramo
-						&& reserva.getPermanencia() instanceof PermanenciaPorHora) {
-					throw new OperationNotSupportedException(
-							" Ya se ha realizado una reserva de otro tipo de permanencia para este día.");
-				}
-				if (reservaNueva.getPermanencia() instanceof PermanenciaPorHora
-						&& reserva.getPermanencia() instanceof PermanenciaPorTramo) {
-					throw new OperationNotSupportedException(
-							" Ya se ha realizado una reserva de otro tipo de permanencia para este día.");
-				}
-			}
 			if (!esMesSiguienteOPosterior(reserva)) {
 				throw new OperationNotSupportedException(
 						" Sólo se pueden hacer reservas para el mes que viene o posteriores.");
@@ -93,8 +102,16 @@ public class Reservas implements IReservas{
 				throw new OperationNotSupportedException(
 						" Esta reserva supera los puntos máximos por mes para dicho profesor.");
 			}
-			if (coleccionReservas.contains(reserva)) {
-				throw new OperationNotSupportedException("Ya existe una reserva igual.");
+			Reserva reservaNueva= getReservaAulaDia(reserva.getAula(), reserva.getPermanencia().getDia());
+			
+			if (reservaNueva != null) {
+				
+				if (reservaNueva.getPermanencia() instanceof PermanenciaPorTramo && reserva.getPermanencia() instanceof PermanenciaPorHora) {
+					throw new OperationNotSupportedException("Ya se ha realizado una reserva de otro tipo de permanencia para este día.");
+				}
+				if (reservaNueva.getPermanencia() instanceof PermanenciaPorHora && reserva.getPermanencia() instanceof PermanenciaPorTramo) {
+					throw new OperationNotSupportedException("Ya se ha realizado una reserva de otro tipo de permanencia para este día.");
+				}
 			}
 			else {
 				coleccionReservas.add(new Reserva(reserva));
@@ -105,15 +122,15 @@ public class Reservas implements IReservas{
 	// Método esMesSiguienteOPosterior
 	private boolean esMesSiguienteOPosterior(Reserva reserva) {
 		if (reserva == null) {
-			throw new NullPointerException(" La reserva no puede ser nula");
+			throw new NullPointerException("La reserva no puede ser nula");
 		}
-		boolean mesSiguiente = false;
+		boolean mesSiguienteOPosterior = false;
 		Month mes = reserva.getPermanencia().getDia().getMonth();
 		Month mesActual = LocalDate.now().getMonth();
 		if (mes.getValue() > mesActual.getValue()) {
-			mesSiguiente = true;
+			mesSiguienteOPosterior = true;
 		}
-		return mesSiguiente;
+		return mesSiguienteOPosterior;
 
 	}
 	
@@ -221,7 +238,7 @@ public class Reservas implements IReservas{
 		if (aula == null) {
 			throw new NullPointerException(" No se puede reservar un aula nula.");
 		}
-		List<Reserva> listaResAula = new ArrayList<>();
+		List<Reserva> listaResAula = new ArrayList<Reserva>();
 		Iterator<Reserva> iterador = coleccionReservas.iterator();
 		while (iterador.hasNext()) {
 			Reserva reserva = iterador.next();
@@ -229,6 +246,7 @@ public class Reservas implements IReservas{
 				listaResAula.add(new Reserva(reserva));
 			}
 		}
+
 		return listaResAula;
 	}
 

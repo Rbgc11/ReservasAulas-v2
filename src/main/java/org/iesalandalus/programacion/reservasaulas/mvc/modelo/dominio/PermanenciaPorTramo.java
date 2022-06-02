@@ -25,7 +25,7 @@ public class PermanenciaPorTramo extends Permanencia{
 	}
 	private void setTramo(Tramo tramo) {
 		if(tramo == null) {
-			throw new NullPointerException(" El tramo de una permanencia no puede ser nulo.");
+			throw new NullPointerException(" ERROR: El tramo de una permanencia no puede ser nulo.");
 		}else {
 		this.tramo = tramo;
 		}

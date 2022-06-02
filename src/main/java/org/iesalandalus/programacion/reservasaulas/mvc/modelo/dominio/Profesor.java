@@ -23,7 +23,7 @@ public class Profesor { //Atributos
     //Constructor Copia
     public Profesor (Profesor profesor) {
         if (profesor == null) {
-			throw new NullPointerException("No se puede copiar un profesor nulo.");
+			throw new NullPointerException("ERROR: No se puede copiar un profesor nulo.");
 		} else {
 		setNombre(profesor.getNombre());
 		setTelefono(profesor.getTelefono());
@@ -34,10 +34,10 @@ public class Profesor { //Atributos
     //Set y Get de los atributos. El set usa el formateaNombre
     private void setNombre(String nombre) {        
         if(nombre==null){       
-            throw new NullPointerException("El nombre del profesor no puede ser nulo.");
+            throw new NullPointerException("ERROR: El nombre del profesor no puede ser nulo.");
         }
         else if(nombre.trim() .equals("")){        
-            throw new IllegalArgumentException("El nombre del profesor no puede estar vacío.");       
+            throw new IllegalArgumentException("ERROR: El nombre del profesor no puede estar vacío.");       
         }
             this.nombre = formateaNombre(nombre);
     }
@@ -45,7 +45,7 @@ public class Profesor { //Atributos
  
   //Método formateaNombre
   		private String formateaNombre(String nombre) {
-  			nombre = nombre.trim().replaceAll("\\s{2,}", " ").toLowerCase();
+  			nombre = nombre.replaceAll("\\s{2,}", " ").trim();
   			String [] formatea = nombre.split(" ");
   			String Nombre2 = "";
   			for (int i=0; i<=formatea.length-1; i++) {
@@ -61,10 +61,10 @@ public class Profesor { //Atributos
     //Set de Correo
     public void setCorreo(String correo) {       
         if(correo==null){
-            throw new NullPointerException("El correo del profesor no puede ser nulo.");      
+            throw new NullPointerException("ERROR: El correo del profesor no puede ser nulo.");      
         }
         if(correo.trim().equals("") || !correo.matches(ER_CORREO)){        
-            throw new IllegalArgumentException("El correo del profesor no es válido.");         
+            throw new IllegalArgumentException("ERROR: El correo del profesor no es válido.");         
         }
             this.correo=correo;        
     }
@@ -75,7 +75,7 @@ public class Profesor { //Atributos
 			this.telefono = null;
 		} 
 		else if (telefono.trim().equals("") || !telefono.matches(ER_TELEFONO)) {
-		      throw new IllegalArgumentException("El teléfono del profesor no es válido.");
+		      throw new IllegalArgumentException("ERROR: El teléfono del profesor no es válido.");
 		    }
 
 		    this.telefono = telefono;
@@ -104,7 +104,7 @@ public class Profesor { //Atributos
   	}
 	@Override
 	public int hashCode() {
-		return Objects.hash(correo, nombre, telefono);
+		return Objects.hash(nombre, correo, telefono);
 	}
 	@Override
 	public boolean equals(Object obj) {
@@ -118,12 +118,17 @@ public class Profesor { //Atributos
 
 	@Override
 	public String toString() {
-		if(telefono == null) {
-			return "nombre=" + nombre + ", correo=" + correo ;
-		} else {
-		
-		return "nombre=" + nombre + ", correo=" + correo + ", telefono=" + telefono;
+		StringBuilder sb = new StringBuilder();
+		sb.append("nombre=");
+		sb.append(this.nombre);
+		sb.append(", correo=");
+		sb.append(this.correo);
+		if (this.telefono !=null) {
+			sb.append(", telefono=");
+			sb.append(this.telefono);
 		}
+		//return "nombre=" + nombre + ", correo=" + correo + ", telefono=" + telefono + "";
+		return sb.toString();
 	}
 }
 

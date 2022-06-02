@@ -18,7 +18,7 @@ public class Reserva {
 	//Constructor copia
 	public Reserva(Reserva reserva)  {
 		if(reserva == null) {
-			throw new NullPointerException("No se puede copiar una reserva nula.");
+			throw new NullPointerException("ERROR: No se puede copiar una reserva nula.");
 		} else {
 	       setProfesor(reserva.profesor);
 	       setAula(reserva.aula);
@@ -29,7 +29,7 @@ public class Reserva {
 	//Setter y Getters
 	private void setProfesor(Profesor profesor)  {
 		if (profesor == null) {
-			throw new NullPointerException("No pueden haber valores nulos");
+			throw new NullPointerException("ERROR: No pueden haber valores nulos");
 		} else {
 			this.profesor = new Profesor(profesor);
 		}
@@ -41,7 +41,7 @@ public class Reserva {
 
 	private void setAula(Aula aula)  {
 		if (aula == null) {
-			throw new NullPointerException("No pueden haber valores nulos");
+			throw new NullPointerException("ERROR: No pueden haber valores nulos");
 		} else {
 			this.aula = new Aula(aula);
 		}
@@ -54,7 +54,7 @@ public class Reserva {
 	//Set de Permanencia
 	private void setPermanencia(Permanencia permanencia) {
 		if (permanencia == null) {
-			throw new NullPointerException("No pueden haber valores nulos");
+			throw new NullPointerException("ERROR: No pueden haber valores nulos");
 			}
 			else if (permanencia instanceof PermanenciaPorTramo) {
 				this.permanencia = new PermanenciaPorTramo((PermanenciaPorTramo) permanencia);
@@ -92,7 +92,7 @@ public class Reserva {
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(aula, permanencia, profesor);
+		return Objects.hash(aula, permanencia);
 	}
 
 	@Override
@@ -102,14 +102,13 @@ public class Reserva {
 		if (!(obj instanceof Reserva))
 			return false;
 		Reserva other = (Reserva) obj;
-		return Objects.equals(aula, other.aula) && Objects.equals(permanencia, other.permanencia)
-				&& Objects.equals(profesor, other.profesor);
+		return Objects.equals(aula, other.aula) && Objects.equals(permanencia, other.permanencia);
 	}
 
+	//Método toString
 	@Override
 	public String toString() {
-		return String.format("%s, %s, %s, puntos=%.1f", profesor, aula, permanencia, getPuntos());
+		return profesor.toString() + ", " + aula.toString() + ", " + permanencia.toString() + ", puntos=" + String.format("%.1f", getPuntos()) + "";
 	}
-
 	
 }

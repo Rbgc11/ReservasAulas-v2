@@ -1,6 +1,7 @@
 package org.iesalandalus.programacion.reservasaulas.mvc.modelo.negocio.memoria;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 
@@ -22,7 +23,7 @@ public class Aulas implements IAulas{
 		// Constructor copia
 		public Aulas(IAulas aulas) {
 			if (aulas == null) {
-				throw new NullPointerException("No se pueden copiar unas aulas nulas.");
+				throw new NullPointerException("ERROR: No se pueden copiar unas aulas nulas.");
 			} else {
 				setAulas(aulas);
 			}
@@ -31,14 +32,17 @@ public class Aulas implements IAulas{
 		// Método setAulas
 		private void setAulas(IAulas aulas) {
 			if (aulas == null) {
-				throw new NullPointerException("No se puede copiar un aula nula.");
+				throw new NullPointerException("ERROR: No se puede copiar un aula nula.");
 			} else {
 				this.coleccionAulas = aulas.getAulas();
 			}
 		}
 		// Método getAulas		
+		@Override
 		public List<Aula> getAulas() {
-			return copiaProfundaAulas(coleccionAulas);
+			List<Aula> aulasOrdenadas = copiaProfundaAulas(coleccionAulas);
+			aulasOrdenadas.sort(Comparator.comparing(Aula::getNombre));
+			return aulasOrdenadas;
 		}
 
 	    
@@ -62,11 +66,11 @@ public class Aulas implements IAulas{
 		// Método insertar
 		public void insertar(Aula aula) throws OperationNotSupportedException {
 			if (aula == null) {
-				throw new NullPointerException(" No se puede insertar un aula nula.");
+				throw new NullPointerException("ERROR: No se puede insertar un aula nula.");
 			} else if (!coleccionAulas.contains(aula)) {
 				coleccionAulas.add(new Aula(aula));
 			} else {
-				throw new OperationNotSupportedException(" Ya existe un aula con ese nombre.");
+				throw new OperationNotSupportedException("ERROR: Ya existe un aula con ese nombre.");
 			}
 		}
 	    
@@ -74,7 +78,7 @@ public class Aulas implements IAulas{
 		// Método buscar
 		public Aula buscar(Aula aula) {
 			if (aula == null) {
-				throw new NullPointerException("No se puede buscar un aula nula.");
+				throw new NullPointerException("ERROR: No se puede buscar un aula nula.");
 			}
 			// Se mira si hay un Aula que existe en coleccionAulas
 			Aula aulaEncontrada = null;
@@ -90,9 +94,9 @@ public class Aulas implements IAulas{
 		// Método borrar
 		public void borrar(Aula aula) throws OperationNotSupportedException {
 			if (aula == null) {
-				throw new NullPointerException("No se puede borrar un aula nula.");
+				throw new NullPointerException("ERROR: No se puede borrar un aula nula.");
 			} else if (!coleccionAulas.contains(aula))  {
-				throw new OperationNotSupportedException("No existe ningún aula con ese nombre.");
+				throw new OperationNotSupportedException("ERROR: No existe ningún aula con ese nombre.");
 			} else {
 				coleccionAulas.remove(coleccionAulas.indexOf(aula));
 			}
